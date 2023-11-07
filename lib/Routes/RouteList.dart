@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'DetailsFromFaculty.dart';
 
 class CustomItem {
   final String title;
@@ -89,7 +90,7 @@ class _RouteListState extends State<RouteList> {
                 hintText: 'Search',
                 hintStyle: TextStyle(color: Colors.white),
                 filled: true,
-                fillColor: Colors.black,
+                fillColor: Colors.white.withOpacity(0.1),
                 prefixIcon: Icon(
                   Icons.search,
                   color: Colors.white,
@@ -115,7 +116,14 @@ class _RouteListState extends State<RouteList> {
                     ),
                   ),
                   tileColor: Colors.black,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DetailsFromFaculty(location: filteredItems[index].description),
+                      )
+                    );
+                  },
                 );
               },
             ),
