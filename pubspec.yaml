@@ -67,6 +67,30 @@ flutter:
      - assets/one.png
      - assets/two.png
      - assets/LoginCover.png
+     - assets/6thOctober.webp
+     - assets/AsemaEdareya.jpg
+     - assets/Attaba.jpg
+     - assets/Badr.webp
+     - assets/ElMohandseen.jpg
+     - assets/ElNozha.jpg
+     - assets/ElSheikhZayed.jpg
+     - assets/ElShrouk.webp
+     - assets/Giza.jpg
+     - assets/Maadi.jpg
+     - assets/Madinty.jpg
+     - assets/MasrElAdeema.jpg
+     - assets/MasrElGdeeda.jpeg
+     - assets/Mokatam.jpg
+     - assets/NasrCity.jpg
+     - assets/NewCairo.jpg
+     - assets/NewHeliopolis.jpg
+     - assets/Obour.jpg
+     - assets/Shobra.jpg
+     - assets/WestElBalad.jpeg
+     - assets/Zamalek.png
+     - assets/Zatoon.jpg
+     - assets/FOEASU.jpg
+     - assets/FromFaculty.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -17,31 +17,31 @@ class RouteList extends StatefulWidget {
 }
 class _RouteListState extends State<RouteList> {
   final List<CustomItem> customItems = [
-    CustomItem('Item 1', 'Nasr City'),
-    CustomItem('Item 2', 'Maadi'),
-    CustomItem('Item 3', 'Zamalek'),
-    CustomItem('Item 4', 'Masr El Gdeeda'),
-    CustomItem('Item 5', 'New Cairo'),
-    CustomItem('Item 6', 'Mokatam'),
-    CustomItem('Item 7', 'Attaba'),
-    CustomItem('Item 8', 'West El balad'),
-    CustomItem('Item 9', 'Asema Edareya'),
-    CustomItem('Item 10', 'Masr El Adeema'),
-    CustomItem('Item 11', '6th October'),
-    CustomItem('Item 12', 'Madinty'),
-    CustomItem('Item 13', 'El Shrouk'),
-    CustomItem('Item 14', 'Oubor'),
-    CustomItem('Item 15', 'Badr'),
-    CustomItem('Item 16', 'New Heliopolis'),
-    CustomItem('Item 17', 'Sheikh Zayed'),
-    CustomItem('Item 18', 'Mohandseen'),
-    CustomItem('Item 19', 'Shobra'),
-    CustomItem('Item 20', 'El Sarayat'),
-    CustomItem('Item 21', 'Midan El Tahrir'),
+    CustomItem('assets/NasrCity.jpg', 'Nasr City'),
+    CustomItem('assets/Maadi.jpg', 'Maadi'),
+    CustomItem('assets/Zamalek.png', 'Zamalek'),
+    CustomItem('assets/MasrElGdeeda.jpeg', 'Masr El Gdeeda'),
+    CustomItem('assets/NewCairo.jpg', 'New Cairo'),
+    CustomItem('assets/Mokatam.jpg', 'Mokatam'),
+    CustomItem('assets/Attaba.jpg', 'Attaba'),
+    CustomItem('assets/WestElBalad.jpeg', 'West El balad'),
+    CustomItem('assets/AsemaEdareya.jpg', 'Asema Edareya'),
+    CustomItem('assets/MasrElAdeema.jpg', 'Masr El Adeema'),
+    CustomItem('assets/6thOctober.webp', '6th October'),
+    CustomItem('assets/Madinty.jpg', 'Madinty'),
+    CustomItem('assets/ElShrouk.webp', 'El Shrouk'),
+    CustomItem('assets/Obour.jpg', 'Oubor'),
+    CustomItem('assets/Badr.webp', 'Badr'),
+    CustomItem('assets/NewHeliopolis.jpg', 'New Heliopolis'),
+    CustomItem('assets/ElSheikhZayed.jpg', 'Sheikh Zayed'),
+    CustomItem('assets/ElMohandseen.jpg', 'Mohandseen'),
+    CustomItem('assets/Shobra.jpg', 'Shobra'),
+    CustomItem('assets/Zatoon.jpg', 'El Zatoon'),
+    CustomItem('assets/ElNozha.jpg', 'El Nozha'),
+    CustomItem('assets/Giza.jpg', 'El Giza'),
 
   ];
   List<CustomItem> filteredItems = [];
-
   @override
   void initState() {
     super.initState();
@@ -104,17 +104,26 @@ class _RouteListState extends State<RouteList> {
               itemCount: filteredItems.length, // Use filteredItems
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                  title: Center(
-                    child: Text(
-                      filteredItems[index].description,
-                      style: GoogleFonts.caveat(
-                        textStyle: TextStyle(
-                          color: Colors.pink,
-                          fontSize: 30,
+                  title:
+                    Row(
+                      children: [
+                        Image.asset(
+                          filteredItems[index].title,
+                          height: 75,
+                          width: 75,
                         ),
-                      ),
+                        SizedBox(width: 20),
+                        Text(
+                          filteredItems[index].description,
+                          style: GoogleFonts.caveat(
+                            textStyle: TextStyle(
+                              color: Colors.pink,
+                              fontSize: 30,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
                   tileColor: Colors.black,
                   onTap: () {
                     Navigator.push(
