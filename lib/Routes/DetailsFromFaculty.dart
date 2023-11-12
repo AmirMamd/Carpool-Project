@@ -38,7 +38,7 @@ class _DetailsState extends State<DetailsFromFaculty> {
   }
   @override
   Widget build(BuildContext context) {
-    double modalHeight = MediaQuery.of(context).size.height*0.6;
+    double modalHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.black,
@@ -53,11 +53,18 @@ class _DetailsState extends State<DetailsFromFaculty> {
                 children: [
                   Image.asset("assets/FromFaculty.png"),
                   Padding(
-                    padding: const EdgeInsets.only(left: 350),
-                    child: Icon(
-                        Icons.shopping_cart,
-                        size: 30,
-                        color: Colors.black),
+                    padding: const EdgeInsets.only(right: 8.0,top:10),
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 350,top:10),
+                    child: IconButton(
+                      icon: Icon(Icons.shopping_cart_outlined, color: Colors.white,size: 27),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ),
                 ],
               ),
@@ -65,7 +72,7 @@ class _DetailsState extends State<DetailsFromFaculty> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
                 child: Container(
-                  height: modalHeight,
+                  height: modalHeight*0.475,
                   width: screenWidth,
                   color: Colors.white,
                   child: Column(
@@ -95,14 +102,13 @@ class _DetailsState extends State<DetailsFromFaculty> {
                           style: GoogleFonts.caveat(
                                 textStyle: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 30,
+                                  fontSize: 25,
                                 ),
                           )),
                         ),
                         onTap: () => _selectDate(context),
                       ),
                       // Add this widget to select a time
-                      SizedBox(height: modalHeight*0.05),
                       Padding(
                         padding: EdgeInsets.all(8.0),
                         child:
@@ -121,7 +127,7 @@ class _DetailsState extends State<DetailsFromFaculty> {
                             style: GoogleFonts.patrickHand(
                               textStyle: TextStyle(
                                 color: Colors.black,
-                                fontSize: 30,
+                                fontSize: 25,
                               ),
                             ),
                           ),

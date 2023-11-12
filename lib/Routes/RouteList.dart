@@ -63,19 +63,30 @@ class _RouteListState extends State<RouteList> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text(
-          'Routes',
-          style: TextStyle(
-            color: Colors.white,
-          ),
+        title: Row(
+          children: [
+            Text(
+              'Routes',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: screenWidth*0.5),
+            IconButton(
+              icon: Icon(Icons.shopping_cart_outlined, color: Colors.white,size: 27),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading:
+            IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
         backgroundColor: Colors.black,
       ),
       body: Column(
