@@ -1,12 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:students_carpool/User/Login.dart';
 import 'DetailsFromFaculty.dart';
+import '/User/Profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CustomItem {
-  final String title;
-  final String description;
+class Location {
+  final String image;
+  final String name;
+  final double price;
 
-  CustomItem(this.title, this.description);
+  Location(this.image, this.name,this.price);
 }
 
 class RouteList extends StatefulWidget {
@@ -16,46 +21,55 @@ class RouteList extends StatefulWidget {
   _RouteListState createState() => _RouteListState();
 }
 class _RouteListState extends State<RouteList> {
-  final List<CustomItem> customItems = [
-    CustomItem('assets/NasrCity.jpg', 'Nasr City'),
-    CustomItem('assets/Maadi.jpg', 'Maadi'),
-    CustomItem('assets/Zamalek.png', 'Zamalek'),
-    CustomItem('assets/MasrElGdeeda.jpeg', 'Masr El Gdeeda'),
-    CustomItem('assets/NewCairo.jpg', 'New Cairo'),
-    CustomItem('assets/Mokatam.jpg', 'Mokatam'),
-    CustomItem('assets/Attaba.jpg', 'Attaba'),
-    CustomItem('assets/WestElBalad.jpeg', 'West El balad'),
-    CustomItem('assets/AsemaEdareya.jpg', 'Asema Edareya'),
-    CustomItem('assets/MasrElAdeema.jpg', 'Masr El Adeema'),
-    CustomItem('assets/6thOctober.webp', '6th October'),
-    CustomItem('assets/Madinty.jpg', 'Madinty'),
-    CustomItem('assets/ElShrouk.webp', 'El Shrouk'),
-    CustomItem('assets/Obour.jpg', 'Oubor'),
-    CustomItem('assets/Badr.webp', 'Badr'),
-    CustomItem('assets/NewHeliopolis.jpg', 'New Heliopolis'),
-    CustomItem('assets/ElSheikhZayed.jpg', 'Sheikh Zayed'),
-    CustomItem('assets/ElMohandseen.jpg', 'Mohandseen'),
-    CustomItem('assets/Shobra.jpg', 'Shobra'),
-    CustomItem('assets/Zatoon.jpg', 'El Zatoon'),
-    CustomItem('assets/ElNozha.jpg', 'El Nozha'),
-    CustomItem('assets/Giza.jpg', 'El Giza'),
+  List<Location> locationItems = [];
+  List<Location> filteredItems = [];
 
-  ];
-  List<CustomItem> filteredItems = [];
   @override
   void initState() {
     super.initState();
-    filteredItems = customItems;
+    fetchDataFromFirestore();
   }
 
+  Future<void> fetchDataFromFirestore() async {
+    try {
+      QuerySnapshot driversSnapshot =
+      await FirebaseFirestore.instance.collection('Drivers').get();
+
+      List<Location> fetchedItems = [];
+
+      for (QueryDocumentSnapshot driverDoc in driversSnapshot.docs) {
+        QuerySnapshot locationsSnapshot = await FirebaseFirestore.instance
+            .collection('Drivers')
+            .doc(driverDoc.id)
+            .collection('VisitedLocations')
+            .get();
+
+        // Iterate through locations and add them to the list
+        locationsSnapshot.docs.forEach((locationDoc) {
+          String imageUrl = locationDoc['imageUrl'];
+          String name = locationDoc['name'];
+          double price = locationDoc['price'].toDouble();
+
+          fetchedItems.add(Location(imageUrl, name, price));
+        });
+      }
+
+      setState(() {
+        locationItems = fetchedItems;
+        filteredItems = locationItems;
+      });
+    } catch (e) {
+      print("Error fetching data: $e");
+    }
+  }
   void filterItems(String query) {
     setState(() {
       if (query.isEmpty) {
-        filteredItems = customItems; // Show all items if query is empty
+        filteredItems = locationItems; // Show all items if query is empty
       } else {
-        filteredItems = customItems
+        filteredItems = locationItems
             .where((item) =>
-            item.description.toLowerCase().contains(query.toLowerCase()))
+            item.name.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
     });
@@ -75,10 +89,27 @@ class _RouteListState extends State<RouteList> {
                 color: Colors.white,
               ),
             ),
-            SizedBox(width: screenWidth*0.5),
+            SizedBox(width: screenWidth*0.30),
             IconButton(
-              icon: Icon(Icons.shopping_cart_outlined, color: Colors.white,size: 27),
-              onPressed: () => Navigator.of(context).pop(),
+              icon: Icon(Icons.person, color: Colors.white,size: 27),
+              onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Profile(),
+                  )
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.exit_to_app, color: Colors.white,size: 27),
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Login(),
+                  )
+                );
+              }
             ),
           ],
         ),
@@ -119,13 +150,13 @@ class _RouteListState extends State<RouteList> {
                     Row(
                       children: [
                         Image.asset(
-                          filteredItems[index].title,
+                          filteredItems[index].image,
                           height: 75,
                           width: 75,
                         ),
                         SizedBox(width: 20),
                         Text(
-                          filteredItems[index].description,
+                          filteredItems[index].name,
                           style: GoogleFonts.caveat(
                             textStyle: TextStyle(
                               color: Colors.pink,
@@ -140,7 +171,7 @@ class _RouteListState extends State<RouteList> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DetailsFromFaculty(location: filteredItems[index].description),
+                          builder: (context) => DetailsFromFaculty(locationItem: filteredItems[index]),
                       )
                     );
                   },

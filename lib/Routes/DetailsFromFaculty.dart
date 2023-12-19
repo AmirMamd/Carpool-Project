@@ -1,25 +1,30 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:students_carpool/Routes/RouteList.dart';
+import 'package:students_carpool/Service/RequestService.dart';
+import '../User/Login.dart';
 import 'DetailsToFaculty.dart';
+import '/User/Profile.dart';
+import '/Cart/RequestCart.dart';
 
 class DetailsFromFaculty extends StatefulWidget {
-  final String location;
-  DetailsFromFaculty({required this.location});
+  final Location locationItem;
+  DetailsFromFaculty({required this.locationItem});
 
   @override
-  State<DetailsFromFaculty> createState() => _DetailsState();
+  State<DetailsFromFaculty> createState() => _DetailsFromFacultyState();
 }
 
-class _DetailsState extends State<DetailsFromFaculty> {
+class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
   int _selectedIndex = 0;
   DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
 
   void _onItemTapped(int index) {
     if (index == 1) {
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DetailsToFaculty(location: widget.location)),
+        MaterialPageRoute(builder: (context) => DetailsToFaculty(locationItem: widget.locationItem)),
       );
     }
   }
@@ -36,6 +41,132 @@ class _DetailsState extends State<DetailsFromFaculty> {
         selectedDate = picked;
       });
   }
+
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: Colors.black,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: Container(
+                  color: Colors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'From Gate 3',
+                      style: GoogleFonts.patrickHand(
+                        textStyle: TextStyle(
+                          color: Colors.pink,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  bool isTimeValid = RequestService.checkTimeFrom(selectedDate, "5:30 PM");
+
+                  if (isTimeValid) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RequestCart(
+                          locationItem: widget.locationItem,
+                          date: selectedDate,
+                          time: "5:30 PM",
+                          meetingPoint: "Gate 3",
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Show an error pop-up because the time condition is not met
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Error"),
+                          content: Text(
+                              "You can only book a ride before the request by 5.5 hours."),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }// Close the modal
+                  // Add your logic here for "From Gate 3"
+                },
+              ),
+              ListTile(
+                title: Container(
+                  color: Colors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'From Gate 4',
+                      style: GoogleFonts.patrickHand(
+                        textStyle: TextStyle(
+                          color: Colors.pink,
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  bool isTimeValid = RequestService.checkTimeFrom(selectedDate, "5:30 PM");
+
+                  if (isTimeValid) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RequestCart(
+                          locationItem: widget.locationItem,
+                          date: selectedDate,
+                          time: "5:30 PM",
+                          meetingPoint: "Gate 4",
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Show an error pop-up because the time condition is not met
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Error"),
+                          content: Text(
+                              "You can only book a ride before the request by maximum 1 PM same day."),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("OK"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }// Close the modal
+                  // Add your logic here for "From Gate 3"
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     double modalHeight = MediaQuery.of(context).size.height;
@@ -51,24 +182,42 @@ class _DetailsState extends State<DetailsFromFaculty> {
             children: [
               Stack(
                 children: [
-                  Image.asset("assets/FromFaculty.png"),
+                  Image.asset("assets/FromFaculty.jpeg",fit: BoxFit.fitHeight,height: modalHeight*0.5),
                   Padding(
-                    padding: const EdgeInsets.only(right: 8.0,top:10),
+                    padding: EdgeInsets.only(left: screenWidth*0.05,top:modalHeight*0.04),
                     child: IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: Colors.black),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 350,top:10),
+                    padding: EdgeInsets.only(left: screenWidth*0.75,top:modalHeight*0.04),
                     child: IconButton(
-                      icon: Icon(Icons.shopping_cart_outlined, color: Colors.white,size: 27),
-                      onPressed: () => Navigator.of(context).pop(),
+                      icon: Icon(Icons.person, color: Colors.black,size: 27),
+                      onPressed: () =>
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Profile()),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: screenWidth*0.85,top:modalHeight*0.04),
+                    child: IconButton(
+                        icon: Icon(Icons.exit_to_app, color: Colors.black,size: 27),
+                        onPressed: () {
+                          FirebaseAuth.instance.signOut();
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const Login(),
+                              )
+                          );
+                        }
                     ),
                   ),
                 ],
               ),
-              /*SizedBox(height: modalHeight*0.6),*/
               ClipRRect(
                 borderRadius: BorderRadius.circular(10), // Adjust the radius as needed
                 child: Container(
@@ -114,10 +263,7 @@ class _DetailsState extends State<DetailsFromFaculty> {
                         child:
                         ElevatedButton(
                           onPressed: () {
-                            /*Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => Register2()),
-                            );*/
+                            _showBottomSheet();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.pink, // Set the button background color
