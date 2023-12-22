@@ -3,14 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:students_carpool/Routes/RouteList.dart';
 import 'package:students_carpool/Service/RequestService.dart';
+import '../Database/DriverOps.dart';
 import '../User/Login.dart';
 import 'DetailsToFaculty.dart';
 import '/User/Profile.dart';
 import '/Cart/RequestCart.dart';
 
+class DriverPrice{
+  String driverId;
+  String driverName;
+  String email;
+  int visitedLocationPrice;
+
+  DriverPrice(this.driverId,this.driverName, this.email, this.visitedLocationPrice);
+}
+
 class DetailsFromFaculty extends StatefulWidget {
   final Location locationItem;
-  DetailsFromFaculty({required this.locationItem});
+  final Future<String?> uid;
+  DetailsFromFaculty({required this.locationItem, required this.uid});
 
   @override
   State<DetailsFromFaculty> createState() => _DetailsFromFacultyState();
@@ -19,12 +30,22 @@ class DetailsFromFaculty extends StatefulWidget {
 class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
   int _selectedIndex = 0;
   DateTime selectedDate = DateTime.now();
+  late List<DriverPrice> driversList = List.empty();
 
+  @override
+  void initState() {
+    super.initState();
+    fetchDriversList(); // Call the function to initialize driversList
+  }
+  Future<void> fetchDriversList() async {
+    driversList = await DriverOps.getDriversVisitedLocation(widget.locationItem.name);
+    setState(() {}); // Update the state after fetching the list
+  }
   void _onItemTapped(int index) {
     if (index == 1) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DetailsToFaculty(locationItem: widget.locationItem)),
+        MaterialPageRoute(builder: (context) => DetailsToFaculty(locationItem: widget.locationItem,driverPriceList: driversList,uid: widget.uid)),
       );
     }
   }
@@ -42,7 +63,70 @@ class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
       });
   }
 
-  void _showBottomSheet() {
+  void _showBottomSheet() async {
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: Colors.black,
+          child: ListView.builder(
+            itemCount: driversList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                onTap: () {
+                  _showSelectionBottomSheet(driversList[index]);
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  padding: EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: Colors.pink,
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(color: Colors.pink, width: 1.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          driversList[index].driverName,
+                          style: TextStyle(color: Colors.white, fontSize: 18.0),
+                        ),
+                      ),
+                      SizedBox(height: 4.0),
+                      Center(
+                        child: Text(
+                          driversList[index].email,
+                          style: TextStyle(color: Colors.white, fontSize: 16.0),
+                        ),
+                      ),
+                      SizedBox(height: 4.0),
+                      Center(
+                        child: Container(
+                          padding: EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade700,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Text(
+                            '${driversList[index].visitedLocationPrice} EGP',
+                            style: TextStyle(color: Colors.white, fontSize: 16.0),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSelectionBottomSheet(DriverPrice selectedDriver) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -79,6 +163,8 @@ class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
                           date: selectedDate,
                           time: "5:30 PM",
                           meetingPoint: "Gate 3",
+                          driverId: selectedDriver.driverId,
+                          uid: widget.uid// Pass the selected driver details
                         ),
                       ),
                     );
@@ -102,8 +188,7 @@ class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
                         );
                       },
                     );
-                  }// Close the modal
-                  // Add your logic here for "From Gate 3"
+                  }
                 },
               ),
               ListTile(
@@ -134,6 +219,8 @@ class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
                           date: selectedDate,
                           time: "5:30 PM",
                           meetingPoint: "Gate 4",
+                          driverId: selectedDriver.driverId,
+                          uid: widget.uid,
                         ),
                       ),
                     );
@@ -167,6 +254,7 @@ class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     double modalHeight = MediaQuery.of(context).size.height;
@@ -197,7 +285,7 @@ class _DetailsFromFacultyState extends State<DetailsFromFaculty> {
                       onPressed: () =>
                         Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Profile()),
+                        MaterialPageRoute(builder: (context) => Profile(uid: widget.uid)),
                       ),
                     ),
                   ),

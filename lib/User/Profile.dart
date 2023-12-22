@@ -1,20 +1,80 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:students_carpool/Database/SQLite/DatabaseHelper.dart';
 
 
 class Profile extends StatefulWidget{
 
-  const Profile({super.key});
+  final Future<String?> uid;
+
+  Profile({required this.uid});
 
   @override
   _ProfileState createState() => _ProfileState();
 
 }
 
+class UserProfile {
+  final String? uid;
+  final String email;
+  final String fullName;
+  final int phoneNumber;
+
+  UserProfile({
+    required this.uid,
+    required this.email,
+    required this.fullName,
+    required this.phoneNumber,
+  });
+
+  // Convert a Map<String, dynamic> to a UserProfile object
+  factory UserProfile.fromMap(Map<String, dynamic> map) {
+    return UserProfile(
+      uid: map['uid'],
+      email: map['email'],
+      fullName: map['fullName'],
+      phoneNumber: map['phoneNumber'],
+    );
+  }
+
+  // Convert a UserProfile object to a Map<String, dynamic>
+  Map<String, dynamic> toMap() {
+    return {
+      'uid': uid,
+      'email': email,
+      'fullName': fullName,
+      'phoneNumber': phoneNumber,
+    };
+  }
+}
+
 class _ProfileState extends State<Profile> {
+  late String? userId ="";
+  late UserProfile? userProfile = UserProfile(uid: "", email: "", fullName: "", phoneNumber: 0);
+  late DatabaseHelper dbHelper = DatabaseHelper();
+  @override
+  void initState(){
+    super.initState();
+    initializeUid();
+
+  }
+  void initializeUid() async{
+    userId = await widget.uid;
+    if (userId != null) {
+      dbHelper = DatabaseHelper();
+      await dbHelper.updateSQLiteFromFirestore(userId);
+      fetchUserProfile();
+    }
+  }
+  void fetchUserProfile() async {
+    // Fetch user profile data from SQLite based on userId
+    if (userId != null) {
+      userProfile = await dbHelper.getUserProfile(userId!);
+      setState(() {});
+
+    }
+  }
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -39,22 +99,14 @@ class _ProfileState extends State<Profile> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(200),
-              child: SizedBox(
-                width: screenWidth*0.5,
-                height: screenHeight*0.29,
-                child: Image.asset("assets/Driver.jpg"),
-              ),
-            ),
-            SizedBox(height: screenHeight * 0.1),
+
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Amir Mamdouh",
+                    userProfile!.fullName,
                     style: TextStyle(
                       color: Colors.pink,
                       fontSize: 24,
@@ -63,50 +115,21 @@ class _ProfileState extends State<Profile> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "19P5021@eng.asu.edu.eg",
+                    userProfile!.email,
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: 18,
                     ),
                   ),
                   SizedBox(height: 10),
-                  Divider(color: Colors.grey),
-                  SizedBox(height: 10),
                   Text(
-                    "Bio:",
+                    '${userProfile!.phoneNumber}',
                     style: TextStyle(
                       color: Colors.pink,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
-                    "Let's make getting to/from campus, easy and enjoyable. \nMy car is clean, comfy, and ready to roll whenever you are.",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Divider(color: Colors.grey),
-                  SizedBox(height: 10),
-                  Text(
-                    "Rating:",
-                    style: TextStyle(
-                      color: Colors.pink,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Row(
-                    children: List.generate(5, (index) {
-                      return Icon(
-                        Icons.star,
-                        color: Colors.white,
-                      );
-                    }),
-                  )
                 ],
               ),
             ),

@@ -4,19 +4,17 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
-import 'package:students_carpool/Firebase/UserOps.dart';
+import 'package:students_carpool/Database/UserOps.dart';
 import 'package:students_carpool/Log/StatusHistory.dart';
 
-import '../Firebase/RequestOps.dart';
+import '../Database/RequestOps.dart';
 
 class PaymentCard extends StatefulWidget {
-  final String asset;
-  final DateTime date;
-  final String time;
-  final String meetingPoint;
+
+  final String requestId;
 
 
-  PaymentCard({required this.asset,required this.date,required this.time,required this.meetingPoint});
+  PaymentCard({required this.requestId});
 
 
   @override
@@ -184,7 +182,8 @@ class _PaymentCardState extends State<PaymentCard> {
   Future<void> _onValidate() async {
     if (formKey.currentState?.validate() ?? false) {
       print('valid!');
-
+      RequestOps.deleteRequest(widget.requestId);
+      Navigator.pop(context);
     } else {
       print('invalid!');
     }

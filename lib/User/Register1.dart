@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:students_carpool/Loader/CarLoader.dart';
 import 'package:students_carpool/Routes/RouteList.dart';
 import 'Login.dart';
-import '/FireBase/firebase_auth_services.dart';
+import '/Database/firebase_auth_services.dart';
 
 class Register1 extends StatefulWidget {
   const Register1({super.key});

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../Firebase/RequestOps.dart';
-import '../Firebase/UserOps.dart';
+import '../Database/RequestOps.dart';
+import '../Database/UserOps.dart';
 import '../Log/StatusHistory.dart';
 import '../User/Login.dart';
 import '/Payment/PaymentCard.dart';
@@ -15,9 +15,10 @@ class RequestCart extends StatefulWidget {
   final DateTime date;
   final String time;
   final String meetingPoint;
+  final String driverId;
+  final Future<String?> uid;
 
-
-  RequestCart({required this.locationItem,required this.date,required this.time,required this.meetingPoint});
+  RequestCart({required this.locationItem,required this.date,required this.time,required this.meetingPoint,required this.driverId,required this.uid});
 
   @override
   State<RequestCart> createState() => _RequestCartState();
@@ -32,7 +33,7 @@ class _RequestCartState extends State<RequestCart> {
   }
 
   Future<void> initializeUserId() async {
-    userId = await UserOps.getCurrentUserDocumentId();
+    userId = await widget.uid;
     if (mounted) {
       setState(() {});
     }
@@ -60,7 +61,7 @@ class _RequestCartState extends State<RequestCart> {
                 onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const Profile(),
+                      builder: (context) => Profile(uid:widget.uid),
                     )
                 ),
               ),
@@ -169,7 +170,10 @@ class _RequestCartState extends State<RequestCart> {
               ),
             ),
             SizedBox(height: 10),
+            locationItem.image.startsWith('assets') ?
             Image.asset(
+              '${locationItem.image}',
+            ) : Image.network(
               '${locationItem.image}',
             ),
             SizedBox(height: screenHeight*0.05),
@@ -210,13 +214,15 @@ class _RequestCartState extends State<RequestCart> {
                           widget.date,
                           widget.time,
                           widget.locationItem.image,
+                          widget.driverId,
                           userId,
+                          widget.locationItem.id
                         ).then((_) {
                           // Navigate to the next screen when the request is completed
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => StatusHistory(UserId: userId),
+                              builder: (context) => StatusHistory(userId: userId,driverId:widget.driverId,uid: widget.uid),
                             ),
                           );
                         });

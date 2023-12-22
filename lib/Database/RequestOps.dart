@@ -1,21 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:students_carpool/Firebase/DriverOps.dart';
+import 'package:students_carpool/Database/DriverOps.dart';
 
 import '../Service/RequestService.dart';
 
 class RequestOps {
 
-  static Future<void> createRequestRecord(String meetingPoint, DateTime date, String time ,String asset,String? userId) async {
+  static Future<void> createRequestRecord(String meetingPoint, DateTime date, String time ,String asset,String driverId,String? userId,String? visitedLocationId) async {
     try {
       Timestamp formattedTimestamp = await RequestService.convertToTimestamp(date, time);
       // Find the driver by asset and get driverId and visitedLocationId
-      Map<String, dynamic>? driverData = await DriverOps.findDriverByAsset(asset);
 
-      if (driverData != null) {
-        String driverId = driverData['driverId'] as String;
-        String visitedLocationId = driverData['visitedLocationId'] as String;
+      if (visitedLocationId != null) {
 
-        // Access the Firestore collection reference for Requests
+
         CollectionReference requests = FirebaseFirestore.instance.collection('Requests');
 
         // Create a new record with meetingPoint, dateTime, and driverId attributes

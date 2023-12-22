@@ -10,8 +10,10 @@ import '/Cart/RequestCart.dart';
 
 class DetailsToFaculty extends StatefulWidget {
   final Location locationItem;
+  final List<DriverPrice> driverPriceList;
+  final Future<String?> uid;
 
-  DetailsToFaculty({required this.locationItem});
+  DetailsToFaculty({required this.locationItem,required this.driverPriceList,required this.uid});
 
   @override
   State<DetailsToFaculty> createState() => _DetailsToFacultyState();
@@ -25,7 +27,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
     if (index == 0) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DetailsFromFaculty(locationItem: widget.locationItem)),
+        MaterialPageRoute(builder: (context) => DetailsFromFaculty(locationItem: widget.locationItem,uid: widget.uid)),
       );
     }
   }
@@ -43,7 +45,70 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
   }
   int _selectedIndex =1;
 
-  void _showBottomSheet() {
+  void _showBottomSheet() async {
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: Colors.black,
+          child: ListView.builder(
+            itemCount: widget.driverPriceList.length,
+            itemBuilder: (BuildContext context, int index) {
+              return GestureDetector(
+                onTap: () {
+                  _showSelectionBottomSheet(widget.driverPriceList[index]);
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  padding: EdgeInsets.all(12.0),
+                  decoration: BoxDecoration(
+                    color: Colors.pink,
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(color: Colors.pink, width: 1.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          widget.driverPriceList[index].driverName,
+                          style: TextStyle(color: Colors.white, fontSize: 18.0),
+                        ),
+                      ),
+                      SizedBox(height: 4.0),
+                      Center(
+                        child: Text(
+                          widget.driverPriceList[index].email,
+                          style: TextStyle(color: Colors.white, fontSize: 16.0),
+                        ),
+                      ),
+                      SizedBox(height: 4.0),
+                      Center(
+                        child: Container(
+                          padding: EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade700,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: Text(
+                            '${widget.driverPriceList[index].visitedLocationPrice} EGP',
+                            style: TextStyle(color: Colors.white, fontSize: 16.0),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSelectionBottomSheet(DriverPrice selectedDriver) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -69,7 +134,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                   ),
                 ),
                 onTap: () {
-                  bool isTimeValid = RequestService.checkTimeTo(selectedDate, "7:30 AM");
+                  bool isTimeValid = RequestService.checkTimeFrom(selectedDate, "7:30 AM");
 
                   if (isTimeValid) {
                     Navigator.push(
@@ -80,6 +145,8 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                           date: selectedDate,
                           time: "7:30 AM",
                           meetingPoint: "Gate 3",
+                          driverId: selectedDriver.driverId,
+                          uid: widget.uid // Pass the selected driver details
                         ),
                       ),
                     );
@@ -91,7 +158,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                         return AlertDialog(
                           title: Text("Error"),
                           content: Text(
-                              "You can only book a ride at 10:00 PM by maximum if the ride is tomorrow morning"),
+                              "You can only book a ride before 10 PM the day before the request"),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
@@ -103,8 +170,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                         );
                       },
                     );
-                  }// Close the modal
-                  // Add your logic here for "From Gate 3"
+                  }
                 },
               ),
               ListTile(
@@ -124,7 +190,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                   ),
                 ),
                 onTap: () {
-                  bool isTimeValid = RequestService.checkTimeFrom(selectedDate, "5:30 PM");
+                  bool isTimeValid = RequestService.checkTimeFrom(selectedDate, "7:30 AM");
 
                   if (isTimeValid) {
                     Navigator.push(
@@ -135,6 +201,8 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                           date: selectedDate,
                           time: "7:30 AM",
                           meetingPoint: "Gate 4",
+                          driverId: selectedDriver.driverId,
+                          uid: widget.uid
                         ),
                       ),
                     );
@@ -146,7 +214,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                         return AlertDialog(
                           title: Text("Error"),
                           content: Text(
-                              "You can only book a ride at 10:00 PM by maximum if the ride is tomorrow morning"),
+                              "You can only book a ride before the request by maximum 1 PM same day."),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () {
@@ -199,7 +267,7 @@ class _DetailsToFacultyState extends State<DetailsToFaculty> {
                       onPressed: () =>
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Profile()),
+                            MaterialPageRoute(builder: (context) => Profile(uid: widget.uid)),
                           ),
                     ),
                   ),
